@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zx.dao.DeptDao">
+
+    <!--根据要求查询部门-->
+    <select id="findBy" parameterType="Dept" resultType="Dept">
+        SELECT * FROM tb_dept
+        <where>
+            <if test="dept_id != null">
+                AND dept_id = #{dept_id}
+            </if>
+            <if test="dept_name != null">
+                AND dept_name = #{dept_name}
+            </if>
+            <if test="major_name != null">
+                AND major_name = #{major_name}
+            </if>
+            <if test="telephone != null">
+                AND telephone = #{telephone}
+            </if>
+            <if test="email != null">
+                AND email = #{email}
+            </if>
+        </where>
+    </select>
+
+    <!--查询所有部门-->
+    <select id="findAll" resultType="Dept">
+        SELECT * FROM tb_dept;
+    </select>
+
+    <!--一对多关联查询:查询所有的部门，同时还要查询出每个部门所关联的员工信息-->
+    <resultMap id="deptMap" type="com.zx.domain.Dept">
+        <id property="dept_id" column="dept_id"></id>
+        <result property="dept_name" column="dept_name"></result>
+        <result property="major_name" column="major_name"></result>
+        <result property="telephone" column="telephone"></result>
+        <result property="email" column="email"></result>
+        <!--
+            collection : 一对多使用collection标签进行关联
+        -->
+        <collection property="employeeList" ofType="com.zx.domain.Employee" column="dept_id"
+                    select="com.zx.dao.EmployeeDao.findByDid" fetchType="lazy"></collection>
+    </resultMap>
+
+    <!--查询所有部门  包括员工信息-->
+    <select id="findAllWithEmp"  resultMap="deptMap">
+       SELECT * FROM tb_dept
+    </select>
+</mapper>
